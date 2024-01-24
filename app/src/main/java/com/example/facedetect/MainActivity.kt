@@ -6,18 +6,26 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var resultTextView: TextView
+    private lateinit var imageView: ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
 
         var buttonCamera= findViewById<Button>(R.id.btnCamera)
+        resultTextView = findViewById(R.id.resultTextView)
+        imageView = findViewById(R.id.imageView)
+
 
         buttonCamera.setOnClickListener {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -37,6 +45,7 @@ class MainActivity : AppCompatActivity() {
             val extras= data?.extras
             val bitmap= extras?.get("data") as? Bitmap
             if (bitmap != null) {
+                imageView.setImageBitmap(bitmap)
                 detectFace(bitmap)
             }
         }
@@ -61,18 +70,17 @@ class MainActivity : AppCompatActivity() {
                 var i=1
                 for(face in faces){
                     resultText="Face Number $i"+
-                            " Smile :${face.smilingProbability?.times(100)}%"+
-                            " Left Eye Open : ${face.leftEyeOpenProbability?.times(100)}%"+
-                            " Right Eye Open : ${face.rightEyeOpenProbability?.times(100)}%"
+                            "\n Smile :${face.smilingProbability?.times(100)}%"+
+                            "\n Left Eye Open : ${face.leftEyeOpenProbability?.times(100)}%"+
+                            "\n Right Eye Open : ${face.rightEyeOpenProbability?.times(100)}%"
                     i++
                 }
-
                 if(faces.isEmpty()){
                     Toast.makeText(this, "No Face Detected", Toast.LENGTH_SHORT).show()
                 }else{
-                    Toast.makeText(this, resultText, Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this, resultText, Toast.LENGTH_LONG).show()
+                    resultTextView.text = resultText
                 }
-
             }
             .addOnFailureListener { e ->
                 // Task failed with an exception
