@@ -10,8 +10,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.google.mlkit.vision.face.FaceLandmark
 
 class MainActivity : AppCompatActivity() {
 
@@ -72,7 +75,10 @@ class MainActivity : AppCompatActivity() {
                     resultText="Face Number $i"+
                             "\n Smile :${face.smilingProbability?.times(100)}%"+
                             "\n Left Eye Open : ${face.leftEyeOpenProbability?.times(100)}%"+
-                            "\n Right Eye Open : ${face.rightEyeOpenProbability?.times(100)}%"
+                            "\n Right Eye Open : ${face.rightEyeOpenProbability?.times(100)}%"+
+                            "\n Nose Base: ${getLandmarkPosition(face, FaceLandmark.NOSE_BASE)}"+
+                            "\n Right Cheek: ${getLandmarkPosition(face, FaceLandmark.RIGHT_CHEEK)}"+
+                            "\n Left Cheek: ${getLandmarkPosition(face, FaceLandmark.LEFT_CHEEK)}"
                     i++
                 }
                 if(faces.isEmpty()){
@@ -87,5 +93,16 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "OOPs Something went wrong", Toast.LENGTH_SHORT).show()
             }
 
+    }
+
+    private fun getLandmarkPosition(face: Face, @FaceLandmark.LandmarkType landmarkType: Int): String {
+        val landmark = face.getLandmark(landmarkType)
+        return if (landmark != null) {
+            val averageX = landmark.position.x
+            val averageY = landmark.position.y
+            "(${(averageX+averageY)/2})"
+        } else {
+            "Not Detected"
+        }
     }
 }
